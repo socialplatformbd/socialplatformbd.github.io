@@ -831,6 +831,14 @@ async function banUser(uid, name) {
   } catch (e) { alert(tx("ব্যান করা যায়নি (অ্যাডমিন/মডারেটরকে ব্যান করা যায় না, আগেই ব্যান থাকলেও এরর আসে): ") + e.message); }
 }
 
+function optImg(u) {
+  return u.replace("/image/upload/", "/image/upload/f_auto,q_auto,c_limit,w_960/");
+}
+
+function optPoster(u) {
+  return u.replace("/video/upload/", "/video/upload/so_0,f_jpg,q_auto,c_limit,w_800/").replace(/\.[A-Za-z0-9]+(\?.*)?$/, ".jpg");
+}
+
 function postCard(p, staffMode, showStatus, autoOpen) {
   const c = el("div", {class: "card"});
   const when = p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleString(loc()) : "";
@@ -839,7 +847,10 @@ function postCard(p, staffMode, showStatus, autoOpen) {
   c.append(meta);
   if (p.text) c.append(el("div", {style: "white-space:pre-wrap"}, p.text));
   if (p.mediaUrl && /^https:\/\/res\.cloudinary\.com\//.test(p.mediaUrl)) {
-    c.append(p.mediaType === "video" ? el("video", {src: p.mediaUrl, controls: true}) : el("img", {src: p.mediaUrl, loading: "lazy"}));
+    c.append(p.mediaType === "video"
+      ? el("video", {src: p.mediaUrl, controls: true, preload: "none", poster: optPoster(p.mediaUrl)})
+      : el("img", {src: optImg(p.mediaUrl), loading: "lazy", style: "cursor:zoom-in", onclick: () => window.open(p.mediaUrl, "_blank"),
+          onerror: e => { if (e.target.src !== p.mediaUrl) e.target.src = p.mediaUrl; }}));
   }
   if (p.status === "approved") engagement(p, c, autoOpen);
   const row = el("div", {class: "row"});
@@ -1153,4 +1164,4 @@ function profile() {
 }
 </script>
 </body>
-                                                    </html>
+  </html>
