@@ -48,6 +48,7 @@ footer a{margin:0 6px}
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStateChanged,signOut,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendPasswordResetEmail,sendEmailVerification,updateProfile} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getAnalytics, logEvent} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 import {getFirestore,collection,addDoc,doc,getDoc,setDoc,updateDoc,deleteDoc,getDocs,query,where,serverTimestamp,getCountFromServer,orderBy,limit,startAfter} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -65,6 +66,9 @@ const UPLOAD_PRESET = "community_uploads";
 const PAGE = 10, MAX_IMG_MB = 10, MAX_VID_MB = 30;
 
 const app = initializeApp(firebaseConfig);
+let analytics = null;
+try { analytics = getAnalytics(app); } catch (e) {}
+const track = (name, params) => { try { if (analytics) logEvent(analytics, name, params || {}); } catch (e) {} };
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -237,6 +241,7 @@ const tx = s => (lang === "en" && EN[s] !== undefined) ? EN[s] : s;
 const loc = () => lang === "en" ? "en-GB" : "bn-BD";
 function setLang(l) {
   lang = l;
+  track("language_change", {lang: l});
   try { localStorage.setItem("lang", l); } catch (e) {}
   document.documentElement.lang = l;
   renderAuth(); renderFoot(); renderNav(); show(tab);
@@ -275,6 +280,7 @@ const PAGES = {
       "পাসওয়ার্ড আমরা নিজে রাখি না; লগইন ও পাসওয়ার্ড ব্যবস্থাপনা Google Firebase Authentication-এর মাধ্যমে হয়।",
       "লেখা ও অন্যান্য ডাটা Google Firebase (Firestore)-এ এবং ছবি-ভিডিও Cloudinary-তে সংরক্ষিত থাকে।",
       "আপনার ভাষার পছন্দ ও লগইন অবস্থা মনে রাখতে আপনার ব্রাউজারে ছোট ডাটা (লোকাল স্টোরেজ/কুকি) রাখা হয়।",
+      "সাইট কেমন ব্যবহার হচ্ছে বুঝতে আমরা Google Analytics-এর মাধ্যমে ব্যবহারের পরিসংখ্যান (যেমন কতজন সাইটে এলো, কোন পেজ দেখল) সংগ্রহ করি।",
       "আমরা আপনার তথ্য বিক্রি করি না।",
       "আপনার পোস্ট মুছতে চাইলে নিজের পোস্টের মুছুন বাটন ব্যবহার করুন, অথবা সাইটের অ্যাডমিনের সাথে যোগাযোগ করুন।",
       "এই নীতি সময়ে সময়ে বদলাতে পারে।"
@@ -285,6 +291,7 @@ const PAGES = {
       "We do not store your password ourselves; login and password management are handled by Google Firebase Authentication.",
       "Text and other data are stored in Google Firebase (Firestore), and photos and videos are stored on Cloudinary.",
       "Small pieces of data (local storage/cookies) are kept in your browser to remember your language choice and login state.",
+      "To understand how the site is used, we collect usage statistics (such as how many people visit and which pages they view) through Google Analytics.",
       "We do not sell your information.",
       "To remove your post, use the delete button on your own post, or contact the site admin.",
       "This policy may change from time to time."
@@ -411,7 +418,7 @@ function renderAuth() {
 
 async function googleLogin() {
   const p = new GoogleAuthProvider();
-  try { await signInWithPopup(auth, p); }
+  try { await signInWithPopup(auth, p); track("login", {method: "google"}); }
   catch (e) { if (e.code !== "auth/popup-closed-by-user") await signInWithRedirect(auth, p); }
 }
 
@@ -469,9 +476,11 @@ function loginView() {
       try {
         if (mode === "in") {
           await signInWithEmailAndPassword(auth, email, pass);
+          track("login", {method: "password"});
         } else {
           const n = name.value.trim().slice(0, 50);
           const cred = await createUserWithEmailAndPassword(auth, email, pass);
+          track("sign_up", {method: "password"});
           await updateProfile(cred.user, {displayName: n});
           try { await setDoc(doc(db, "users", cred.user.uid), {name: n, email: email.toLowerCase()}, {merge: true}); } catch (e) {}
           if (cfg.requireVerify) {
@@ -576,6 +585,7 @@ async function singlePost() {
 }
 
 function shareUrl(url, text) {
+  track("share");
   if (navigator.share) navigator.share({title: SITE, text, url}).catch(() => {});
   else if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => alert(tx("লিংক কপি হয়েছে।")), () => prompt(tx("লিংক কপি করুন:"), url));
   else prompt(tx("লিংক কপি করুন:"), url);
@@ -642,6 +652,7 @@ async function userPage() {
           } else {
             await setDoc(doc(db, "follows", fid), {follower: user.uid, followee: uid, createdAt: serverTimestamp()});
             following = true; followers = (followers || 0) + 1;
+            track("follow");
             notify({id: "follow_" + fid, to: uid, type: "follow", postId: "", text: ""});
           }
         } catch (e) { alert(tx("সমস্যা: ") + e.message); }
@@ -904,6 +915,7 @@ function engagement(p, c, autoOpen) {
       else {
         const first = !mine;
         await setDoc(likeRef, {uid: user.uid, type: t});
+        track("reaction", {type: t});
         if (first) {
           count++;
           if (p.uid && p.uid !== user.uid) notify({id: "like_" + p.id + "_" + user.uid, to: p.uid, type: "like", postId: p.id, text: EMO[t]});
@@ -971,6 +983,7 @@ function loadComments(p, box) {
           uid: user.uid, authorName: nm(),
           text: t.slice(0, 1000), createdAt: serverTimestamp()
         });
+        track("comment_created");
         if (p.uid && p.uid !== user.uid) notify({id: "comment_" + cref.id, to: p.uid, type: "comment", postId: p.id, ref: cref.id, text: t});
         inp.value = ""; await refresh();
       } catch (e) { alert(tx("সমস্যা: ") + e.message); }
@@ -1032,6 +1045,7 @@ function newPost() {
         text: text.slice(0, 5000), mediaUrl, mediaType,
         status, createdAt: serverTimestamp()
       });
+      track("post_created", {status, has_media: mediaUrl ? 1 : 0});
       alert(status === "approved" ? tx("পোস্ট প্রকাশিত হয়েছে।") : tx("পোস্ট জমা হয়েছে। অনুমোদনের পর সবাই দেখতে পাবে।"));
       show(status === "approved" ? "home" : "mine");
     } catch (e) { msg.textContent = tx("সমস্যা: ") + e.message; btn.disabled = false; }
