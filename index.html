@@ -48,6 +48,7 @@ a{color:#7fb2ff}
 .an{color:#fff;font-weight:600;text-decoration:none;font-size:15px}
 footer{max-width:640px;margin:0 auto;padding:6px 12px 110px;text-align:center;font-size:12px;color:#7d8fb8}
 footer a{margin:0 6px;color:#9db4ee}
+.vb{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#1d9bf0;color:#fff;font-size:11px;font-weight:700;margin-left:5px;vertical-align:middle;line-height:1}
 .av{overflow:hidden}
 .av.big{width:64px;height:64px;font-size:26px}
 .card .av img{width:100%;height:100%;margin:0;border-radius:50%;object-fit:cover;max-height:none;background:none}
@@ -281,7 +282,15 @@ const EN = {
  "খুঁজুন": "Search",
  "নাম দিয়ে ইউজার খুঁজুন...": "Search users by name...",
  "কমপক্ষে ২ অক্ষর লিখুন। শুধু ইউজারের নাম দিয়ে খোঁজা যায়।": "Type at least 2 characters. You can only search by user name.",
- "কাউকে পাওয়া যায়নি।": "No users found."
+ "কাউকে পাওয়া যায়নি।": "No users found.",
+ "ভেরিফাইড": "Verified",
+ "✓ ভেরিফাই করুন": "✓ Verify",
+ "ভেরিফাই সরান": "Remove verification",
+ "এই ইউজারকে ভেরিফাইড (নীল চিহ্ন) করবেন?": "Give this user the verified (blue check) badge?",
+ "ভেরিফিকেশন সরাবেন?": "Remove the verified badge?",
+ "ভেরিফাইড চিহ্ন যোগ হয়েছে।": "Verified badge added.",
+ "ভেরিফাইড চিহ্ন সরানো হয়েছে।": "Verified badge removed.",
+ "ভেরিফাইড অ্যাকাউন্ট": "Verified account"
 };
 const tx = s => (lang === "en" && EN[s] !== undefined) ? EN[s] : s;
 const loc = () => lang === "en" ? "en-GB" : "bn-BD";
@@ -305,7 +314,8 @@ const PAGES = {
       "ভুয়া খবর, প্রতারণা, স্প্যাম ও অযাচিত বিজ্ঞাপন নিষিদ্ধ।",
       "অন্যের ব্যক্তিগত তথ্য (ফোন নম্বর, ঠিকানা, ব্যক্তিগত ছবি) তার অনুমতি ছাড়া প্রকাশ করবেন না।",
       "অ্যাডমিন ও মডারেটর নিয়ম ভাঙা যেকোনো কনটেন্ট মুছে ফেলতে এবং প্রয়োজনে অ্যাকাউন্ট ব্লক করতে পারেন।",
-      "আপত্তিকর কিছু দেখলে পোস্ট বা কমেন্টের পাশের রিপোর্ট বাটন ব্যবহার করুন।"
+      "আপত্তিকর কিছু দেখলে পোস্ট বা কমেন্টের পাশের রিপোর্ট বাটন ব্যবহার করুন।",
+      "নামের পাশে নীল ✓ চিহ্ন মানে সাইটের অ্যাডমিন ওই অ্যাকাউন্টের পরিচয় যাচাই করেছেন।"
     ],
     en: [
       "Be kind and respectful to everyone. Abuse, harassment, threats and hate speech are not allowed.",
@@ -315,7 +325,8 @@ const PAGES = {
       "Fake news, scams, spam and unwanted advertising are not allowed.",
       "Do not share other people's private information (phone numbers, addresses, private photos) without their permission.",
       "Admins and moderators may remove any content that breaks the rules and block accounts when needed.",
-      "If you see something inappropriate, use the report button next to the post or comment."
+      "If you see something inappropriate, use the report button next to the post or comment.",
+      "A blue ✓ next to a name means a site admin has verified the identity of that account."
     ]
   },
   privacy: {
@@ -453,7 +464,7 @@ onAuthStateChanged(auth, async u => {
 function renderFoot() {
   const f = $("#foot"); f.innerHTML = "";
   f.append(el("div", {}, el("a", {href: "#page=rules"}, tx("নিয়মাবলী")), el("a", {href: "#page=privacy"}, tx("প্রাইভেসি পলিসি")), el("a", {href: "#page=about"}, tx("আমাদের সম্পর্কে"))),
-    el("div", {style: "margin-top:6px"}, "© " + SITE + " · v15"));
+    el("div", {style: "margin-top:6px"}, "© " + SITE + " · v16"));
 }
 
 function pageView() {
@@ -702,6 +713,7 @@ async function popularFeed() {
   } catch (e) { ld.remove(); m.append(errBox(e)); }
 }
 
+const vBadge = () => el("span", {class: "vb", title: tx("ভেরিফাইড")}, "✓");
 const profCache = new Map();
 function getProfile(uid) {
   if (!profCache.has(uid)) {
@@ -757,7 +769,7 @@ function editProfileCard() {
         url = j.secure_url;
       }
       const nn = n.slice(0, 40);
-      await setDoc(doc(db, "profiles", user.uid), {name: nn, nameLower: nn.toLowerCase(), bio: bio.value.trim().slice(0, 160), photoUrl: url, updatedAt: serverTimestamp()});
+      await setDoc(doc(db, "profiles", user.uid), {name: nn, nameLower: nn.toLowerCase(), bio: bio.value.trim().slice(0, 160), photoUrl: url, updatedAt: serverTimestamp()}, {merge: true});
       if (n !== user.displayName) await updateProfile(user, {displayName: n});
       profCache.delete(user.uid);
       alert(tx("প্রোফাইল সংরক্ষিত হয়েছে।"));
@@ -801,7 +813,7 @@ function searchPage() {
         const av = el("div", {class: "av"}, (nameTxt.trim()[0] || "?").toUpperCase());
         if (okPhoto(pr.photoUrl)) { av.textContent = ""; av.append(avatarImg(pr.photoUrl, 80)); }
         out.append(el("a", {href: "#user=" + d.id, class: "card", style: "display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit"},
-          av, el("div", {}, el("div", {class: "an"}, nameTxt), el("div", {class: "meta", style: "margin:0"}, (pr.bio || "").slice(0, 80)))));
+          av, el("div", {}, (() => { const d2 = el("div", {class: "an"}, nameTxt); if (pr.verified === true) d2.append(vBadge()); return d2; })(), el("div", {class: "meta", style: "margin:0"}, (pr.bio || "").slice(0, 80)))));
       });
     } catch (e) { if (my !== seq) return; out.innerHTML = ""; out.append(errBox(e)); }
   };
@@ -828,7 +840,7 @@ async function userPage() {
     const avBig = el("div", {class: "av big"}, (name.trim()[0] || "?").toUpperCase());
     if (prof && okPhoto(prof.photoUrl)) { avBig.textContent = ""; avBig.append(avatarImg(prof.photoUrl, 192)); }
     head.append(el("div", {class: "ph"}, avBig, el("div", {},
-      el("b", {style: "font-size:18px"}, name),
+      (() => { const b = el("b", {style: "font-size:18px"}, name); if (prof && prof.verified === true) b.append(vBadge()); return b; })(),
       el("div", {class: "meta", style: "margin:2px 0 0"}, tx("প্রকাশিত পোস্ট: ") + (total === null ? "..." : total) + tx(" · ফলোয়ার: ") + (followers === null ? "..." : followers)))));
     if (prof && prof.bio) head.append(el("div", {style: "font-size:14px;margin:6px 0;white-space:pre-wrap"}, prof.bio));
     const row = el("div", {class: "row"});
@@ -860,6 +872,17 @@ async function userPage() {
         try { await deleteDoc(doc(db, "profiles", uid)); profCache.delete(uid); prof = null; fillHead(); alert(tx("প্রোফাইল রিসেট হয়েছে।")); }
         catch (e) { alert(tx("সমস্যা: ") + e.message); }
       }}, tx("প্রোফাইল রিসেট")));
+    }
+    if (isAdmin() && user && prof) {
+      const isV = prof.verified === true;
+      row.append(el("button", {class: isV ? "sec" : "ok", onclick: async () => {
+        if (!confirm(isV ? tx("ভেরিফিকেশন সরাবেন?") : tx("এই ইউজারকে ভেরিফাইড (নীল চিহ্ন) করবেন?"))) return;
+        try {
+          await setDoc(doc(db, "profiles", uid), {verified: !isV}, {merge: true});
+          profCache.delete(uid); prof = await getProfile(uid); fillHead();
+          alert(isV ? tx("ভেরিফাইড চিহ্ন সরানো হয়েছে।") : tx("ভেরিফাইড চিহ্ন যোগ হয়েছে।"));
+        } catch (e) { alert(tx("সমস্যা: ") + e.message); }
+      }}, isV ? tx("ভেরিফাই সরান") : tx("✓ ভেরিফাই করুন")));
     }
     head.append(row);
   };
@@ -1090,6 +1113,7 @@ function postCard(p, staffMode, showStatus, autoOpen) {
     if (!pr) return;
     if (pr.name) nameEl.textContent = pr.name;
     if (okPhoto(pr.photoUrl)) { av.textContent = ""; av.append(avatarImg(pr.photoUrl, 80)); }
+    if (pr.verified === true) nameEl.append(vBadge());
   });
   if (p.text) c.append(el("div", {style: "white-space:pre-wrap"}, p.text));
   if (p.mediaUrl && /^https:\/\/res\.cloudinary\.com\//.test(p.mediaUrl)) {
@@ -1186,7 +1210,9 @@ function loadComments(p, box) {
       list.innerHTML = "";
       if (!items.length) list.append(el("div", {class: "meta"}, tx("এখনো কোনো কমেন্ট নেই।")));
       items.forEach(cm => {
-        const row = el("div", {class: "cm"}, el("a", {href: "#user=" + cm.uid, style: "font-weight:bold;color:inherit;text-decoration:none"}, cm.authorName || tx("অজ্ঞাত")), ": ", cm.text);
+        const an = el("a", {href: "#user=" + cm.uid, style: "font-weight:bold;color:inherit;text-decoration:none"}, cm.authorName || tx("অজ্ঞাত"));
+        const row = el("div", {class: "cm"}, an, ": ", cm.text);
+        getProfile(cm.uid).then(pr => { if (pr && pr.verified === true) an.append(vBadge()); });
         if (user && (cm.uid === user.uid || isStaff())) {
           row.append(" ", el("a", {href: "#", onclick: async e => {
             e.preventDefault();
@@ -1391,8 +1417,10 @@ async function loadRoles() {
 }
 
 function profile() {
+  const nameRow = el("div", {}, nm());
+  getProfile(user.uid).then(pr => { if (pr && pr.verified === true) nameRow.append(vBadge(), " ", el("span", {class: "meta"}, tx("ভেরিফাইড অ্যাকাউন্ট"))); });
   const card = el("div", {class: "card"},
-    el("div", {}, nm()), el("div", {class: "meta"}, user.email),
+    nameRow, el("div", {class: "meta"}, user.email),
     el("div", {}, tx("রোল: ") + role),
     el("div", {class: "meta"}, tx("আপনার UID:")), el("div", {class: "small"}, user.uid));
   if (banned) card.append(el("div", {class: "meta", style: "margin-top:8px"}, tx("আপনার অ্যাকাউন্ট ব্লক করা হয়েছে।")));
