@@ -277,7 +277,11 @@ const EN = {
  "এখনো কোনো ছবি বা ভিডিও পোস্ট নেই।": "No photo or video posts yet.",
  "প্রোফাইল রিসেট": "Reset profile",
  "এই ইউজারের প্রোফাইল ছবি ও বায়ো মুছে ফেলবেন?": "Remove this user's profile photo and bio?",
- "প্রোফাইল রিসেট হয়েছে।": "Profile reset."
+ "প্রোফাইল রিসেট হয়েছে।": "Profile reset.",
+ "খুঁজুন": "Search",
+ "নাম দিয়ে ইউজার খুঁজুন...": "Search users by name...",
+ "কমপক্ষে ২ অক্ষর লিখুন। শুধু ইউজারের নাম দিয়ে খোঁজা যায়।": "Type at least 2 characters. You can only search by user name.",
+ "কাউকে পাওয়া যায়নি।": "No users found."
 };
 const tx = s => (lang === "en" && EN[s] !== undefined) ? EN[s] : s;
 const loc = () => lang === "en" ? "en-GB" : "bn-BD";
@@ -318,7 +322,7 @@ const PAGES = {
     title: {bn: "প্রাইভেসি পলিসি", en: "Privacy Policy"},
     bn: [
       "আমরা যা সংগ্রহ করি: আপনার নাম ও ইমেইল (সাইন আপ বা Google লগইনের সময়), এবং আপনি যা পোস্ট, কমেন্ট, রিঅ্যাকশন বা ফলো করেন তার তথ্য।",
-      "সবার জন্য দৃশ্যমান: আপনার নাম, প্রকাশিত পোস্ট, কমেন্ট, রিঅ্যাকশনের সংখ্যা ও ফলো সম্পর্ক। আপনার ইমেইল অন্য সাধারণ ইউজারদের দেখানো হয় না, তবে সাইটের অ্যাডমিনরা রোল পরিচালনার জন্য তা দেখতে পারেন।",
+      "সবার জন্য দৃশ্যমান: আপনার নাম, প্রোফাইল ছবি ও বায়ো (যা আপনি দেন), প্রকাশিত পোস্ট, কমেন্ট, রিঅ্যাকশনের সংখ্যা ও ফলো সম্পর্ক। অন্যরা নাম দিয়ে আপনার প্রোফাইল খুঁজে পেতে পারে। আপনার ইমেইল অন্য সাধারণ ইউজারদের দেখানো হয় না, তবে সাইটের অ্যাডমিনরা রোল পরিচালনার জন্য তা দেখতে পারেন।",
       "পাসওয়ার্ড আমরা নিজে রাখি না; লগইন ও পাসওয়ার্ড ব্যবস্থাপনা Google Firebase Authentication-এর মাধ্যমে হয়।",
       "লেখা ও অন্যান্য ডাটা Google Firebase (Firestore)-এ এবং ছবি-ভিডিও Cloudinary-তে সংরক্ষিত থাকে।",
       "আপনার ভাষার পছন্দ ও লগইন অবস্থা মনে রাখতে আপনার ব্রাউজারে ছোট ডাটা (লোকাল স্টোরেজ/কুকি) রাখা হয়।",
@@ -329,7 +333,7 @@ const PAGES = {
     ],
     en: [
       "What we collect: your name and email (when you sign up or use Google login), and information about what you post, comment, react to or follow.",
-      "Visible to everyone: your name, published posts, comments, reaction counts and follow relationships. Your email is not shown to other regular users, but site admins can see it to manage roles.",
+      "Visible to everyone: your name, profile photo and bio (if you add them), published posts, comments, reaction counts and follow relationships. Other users can find your profile by searching your name. Your email is not shown to other regular users, but site admins can see it to manage roles.",
       "We do not store your password ourselves; login and password management are handled by Google Firebase Authentication.",
       "Text and other data are stored in Google Firebase (Firestore), and photos and videos are stored on Cloudinary.",
       "Small pieces of data (local storage/cookies) are kept in your browser to remember your language choice and login state.",
@@ -428,6 +432,17 @@ onAuthStateChanged(auth, async u => {
       const r = await getDoc(doc(db, "roles", u.uid));
       if (r.exists()) role = r.data().role;
       banned = (await getDoc(doc(db, "banned", u.uid))).exists();
+      if (u.displayName && !banned) {
+        const ps = await getDoc(doc(db, "profiles", u.uid));
+        const nn = u.displayName.slice(0, 40);
+        if (!ps.exists()) {
+          await setDoc(doc(db, "profiles", u.uid), {name: nn, nameLower: nn.toLowerCase(), bio: "", photoUrl: "", updatedAt: serverTimestamp()});
+          profCache.delete(u.uid);
+        } else if (ps.data().nameLower === undefined && ps.data().name) {
+          await setDoc(doc(db, "profiles", u.uid), {nameLower: ps.data().name.toLowerCase()}, {merge: true});
+          profCache.delete(u.uid);
+        }
+      }
     } catch (e) { console.error(e); }
     if (tab === "login") tab = "home";
   }
@@ -438,7 +453,7 @@ onAuthStateChanged(auth, async u => {
 function renderFoot() {
   const f = $("#foot"); f.innerHTML = "";
   f.append(el("div", {}, el("a", {href: "#page=rules"}, tx("নিয়মাবলী")), el("a", {href: "#page=privacy"}, tx("প্রাইভেসি পলিসি")), el("a", {href: "#page=about"}, tx("আমাদের সম্পর্কে"))),
-    el("div", {style: "margin-top:6px"}, "© " + SITE));
+    el("div", {style: "margin-top:6px"}, "© " + SITE + " · v15"));
 }
 
 function pageView() {
@@ -481,8 +496,8 @@ function renderNav() {
   const b = $("#bar"); b.innerHTML = "";
   const inHome = ["home", "popular", "feed", "post", "user", "page"].includes(tab);
   const items = user
-    ? [["home", "🏠", tx("হোম"), inHome], ["new", "➕", tx("পোস্ট"), tab === "new", "plus"], ["notif", "🔔", tx("নোটিফিকেশন"), tab === "notif"], ["me", "👤", tx("প্রোফাইল"), meTabs.includes(tab)]]
-    : [["home", "🏠", tx("হোম"), ["home", "post", "user", "page"].includes(tab)], ["popular", "🔥", tx("জনপ্রিয়"), tab === "popular"], ["login", "🔑", tx("লগইন"), tab === "login"]];
+    ? [["home", "🏠", tx("হোম"), inHome], ["search", "🔍", tx("খুঁজুন"), tab === "search"], ["new", "➕", tx("পোস্ট"), tab === "new", "plus"], ["notif", "🔔", tx("নোটিফিকেশন"), tab === "notif"], ["me", "👤", tx("প্রোফাইল"), meTabs.includes(tab)]]
+    : [["home", "🏠", tx("হোম"), ["home", "post", "user", "page"].includes(tab)], ["popular", "🔥", tx("জনপ্রিয়"), tab === "popular"], ["search", "🔍", tx("খুঁজুন"), tab === "search"], ["login", "🔑", tx("লগইন"), tab === "login"]];
   items.forEach(([k, ic, lb, on, cls]) => {
     const btn = el("button", {class: (on ? "on " : "") + (cls || ""), onclick: () => show(k)}, el("span", {class: "ic"}, ic), el("span", {}, lb));
     if (k === "notif" && unread) btn.append(el("span", {class: "bdg"}, String(unread)));
@@ -500,6 +515,7 @@ function show(t) {
   if (t === "login") return user ? show("home") : loginView();
   if (t === "home") return homeFeed();
   if (t === "popular") return popularFeed();
+  if (t === "search") return searchPage();
   if (!user) {
     m.append(el("div", {class: "center"}, tx("এই পেজ দেখতে লগইন করুন।"),
       el("div", {class: "row", style: "justify-content:center"}, el("button", {onclick: () => show("login")}, tx("লগইন / সাইন আপ")))));
@@ -541,6 +557,7 @@ function loginView() {
           track("sign_up", {method: "password"});
           await updateProfile(cred.user, {displayName: n});
           try { await setDoc(doc(db, "users", cred.user.uid), {name: n, email: email.toLowerCase()}, {merge: true}); } catch (e) {}
+          try { await setDoc(doc(db, "profiles", cred.user.uid), {name: n, nameLower: n.toLowerCase(), bio: "", photoUrl: "", updatedAt: serverTimestamp()}); } catch (e) {}
           if (cfg.requireVerify) {
             try { await sendEmailVerification(cred.user); } catch (e) {}
             alert(tx("আপনার ইমেইলে একটা ভেরিফিকেশন লিংক পাঠানো হয়েছে (স্প্যাম ফোল্ডারও দেখুন)। লিংকে চাপ দিয়ে ভেরিফাই করুন।"));
@@ -739,7 +756,8 @@ function editProfileCard() {
         if (!j.secure_url) throw new Error(tx("আপলোড ব্যর্থ"));
         url = j.secure_url;
       }
-      await setDoc(doc(db, "profiles", user.uid), {name: n.slice(0, 40), bio: bio.value.trim().slice(0, 160), photoUrl: url, updatedAt: serverTimestamp()});
+      const nn = n.slice(0, 40);
+      await setDoc(doc(db, "profiles", user.uid), {name: nn, nameLower: nn.toLowerCase(), bio: bio.value.trim().slice(0, 160), photoUrl: url, updatedAt: serverTimestamp()});
       if (n !== user.displayName) await updateProfile(user, {displayName: n});
       profCache.delete(user.uid);
       alert(tx("প্রোফাইল সংরক্ষিত হয়েছে।"));
@@ -756,6 +774,39 @@ function editProfileCard() {
     if (okPhoto(photoUrl)) { prev.textContent = ""; prev.append(avatarImg(photoUrl, 128)); }
   });
   return card;
+}
+
+let searchTimer = null;
+
+function searchPage() {
+  const m = $("#main");
+  const inp = el("input", {type: "text", placeholder: tx("নাম দিয়ে ইউজার খুঁজুন..."), maxLength: 40});
+  const out = el("div", {});
+  m.append(el("div", {class: "card"}, inp, el("div", {class: "meta", style: "margin:0"}, tx("কমপক্ষে ২ অক্ষর লিখুন। শুধু ইউজারের নাম দিয়ে খোঁজা যায়।"))), out);
+  let seq = 0;
+  const run = async () => {
+    const qs = inp.value.trim().toLowerCase();
+    const my = ++seq;
+    out.innerHTML = "";
+    if (qs.length < 2) return;
+    out.append(el("div", {class: "center", style: "padding:14px"}, tx("লোড হচ্ছে...")));
+    try {
+      const snap = await getDocs(query(collection(db, "profiles"), orderBy("nameLower"), where("nameLower", ">=", qs), where("nameLower", "<=", qs + "\uf8ff"), limit(20)));
+      if (my !== seq) return;
+      out.innerHTML = "";
+      if (!snap.docs.length) { out.append(el("div", {class: "center"}, tx("কাউকে পাওয়া যায়নি।"))); return; }
+      snap.docs.forEach(d => {
+        const pr = d.data();
+        const nameTxt = pr.name || tx("ইউজার");
+        const av = el("div", {class: "av"}, (nameTxt.trim()[0] || "?").toUpperCase());
+        if (okPhoto(pr.photoUrl)) { av.textContent = ""; av.append(avatarImg(pr.photoUrl, 80)); }
+        out.append(el("a", {href: "#user=" + d.id, class: "card", style: "display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit"},
+          av, el("div", {}, el("div", {class: "an"}, nameTxt), el("div", {class: "meta", style: "margin:0"}, (pr.bio || "").slice(0, 80)))));
+      });
+    } catch (e) { if (my !== seq) return; out.innerHTML = ""; out.append(errBox(e)); }
+  };
+  inp.addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(run, 450); });
+  setTimeout(() => inp.focus(), 60);
 }
 
 async function userPage() {
