@@ -5,38 +5,63 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Social platform bd</title>
 <meta name="description" content="Social platform bd – ছবি, ভিডিও ও লেখা শেয়ার করুন | Share photos, videos and posts">
-<meta name="theme-color" content="#1d4ed8">
+<meta name="theme-color" content="#0b1224">
 <meta property="og:title" content="Social platform bd">
 <meta property="og:description" content="ছবি, ভিডিও ও লেখা শেয়ার করুন | Share photos, videos and posts">
 <meta property="og:type" content="website">
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,sans-serif;background:#f3f4f6;color:#111}
-header{background:#1d4ed8;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
-header h1{font-size:18px;margin:0}
-button{border:0;border-radius:8px;padding:9px 14px;font-size:14px;cursor:pointer;background:#1d4ed8;color:#fff}
-button.sec{background:#e5e7eb;color:#111}
-button.ok{background:#16a34a}button.no{background:#dc2626}
-nav{display:flex;gap:6px;padding:10px;overflow-x:auto;background:#fff;border-bottom:1px solid #ddd}
-nav button{background:#e5e7eb;color:#111;white-space:nowrap}
-nav button.on{background:#1d4ed8;color:#fff}
+:root{color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;color:#e8ecf8;background:#0b1224 linear-gradient(160deg,#0b1224 0%,#13204a 55%,#0a1a33 100%) fixed;min-height:100vh}
+header{position:sticky;top:0;z-index:20;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;background:rgba(11,18,36,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
+header h1{font-size:18px;margin:0;display:flex;align-items:center;gap:8px;color:#fff}
+header h1::before{content:"S";display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);font-weight:800;font-size:16px}
+button{border:0;border-radius:12px;padding:9px 14px;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-family:inherit}
+button:disabled{opacity:.5}
+button.sec{background:rgba(255,255,255,.1);color:#dbe4ff}
+button.ok{background:linear-gradient(135deg,#10b981,#059669)}
+button.no{background:linear-gradient(135deg,#ef4444,#dc2626)}
+nav{display:flex;gap:8px;padding:12px 12px 4px;overflow-x:auto;max-width:640px;margin:0 auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{background:rgba(255,255,255,.08);color:#c9d6f5;white-space:nowrap;border-radius:999px;padding:8px 16px}
+nav button.on{background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.35)}
 main{max-width:640px;margin:0 auto;padding:12px}
-.card{background:#fff;border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px #0001}
-.card img,.card video{width:100%;border-radius:8px;margin-top:8px;max-height:420px;object-fit:contain;background:#000}
-.meta{font-size:12px;color:#666;margin-bottom:6px}
-.badge{font-size:11px;padding:2px 8px;border-radius:10px;background:#fde68a}
-.badge.approved{background:#bbf7d0}.badge.rejected{background:#fecaca}
-textarea,input[type=text],input[type=email],input[type=password]{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:15px;margin-bottom:8px;font-family:inherit}
-.row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:14px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.card img,.card video{width:100%;border-radius:16px;margin-top:10px;max-height:480px;object-fit:contain;background:#050914}
+.meta{font-size:12px;color:#93a4cc;margin-bottom:6px}
+.badge{font-size:11px;padding:2px 9px;border-radius:10px;background:#fde68a;color:#3a2e00}
+.badge.approved{background:#bbf7d0;color:#052e16}.badge.rejected{background:#fecaca;color:#450a0a}
+textarea,input[type=text],input[type=email],input[type=password]{width:100%;padding:11px 12px;border:1px solid rgba(255,255,255,.16);border-radius:12px;font-size:15px;margin-bottom:8px;font-family:inherit;background:rgba(255,255,255,.07);color:#fff;outline:none}
+textarea:focus,input:focus{border-color:#6c8cff}
+::placeholder{color:#8091bb}
+input[type=file]{color:#c9d6f5;font-size:13px;margin:6px 0}
+.row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .hide{display:none}
-.center{text-align:center;padding:40px 12px}
-.small{font-size:12px;color:#555;word-break:break-all}
-.cm{padding:6px 0;border-top:1px solid #eee;font-size:14px;white-space:pre-wrap}
+.center{text-align:center;padding:40px 12px;color:#aab8dc}
+.small{font-size:12px;color:#aab8dc;word-break:break-all}
+.cm{padding:8px 0;border-top:1px solid rgba(255,255,255,.08);font-size:14px;white-space:pre-wrap}
 .row input{flex:1;margin-bottom:0}
-a{color:#1d4ed8}
+a{color:#7fb2ff}
 #auth{display:flex;gap:6px}
-footer{max-width:640px;margin:0 auto;padding:6px 12px 30px;text-align:center;font-size:12px;color:#666}
-footer a{margin:0 6px}
+.ph{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a855f7);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;text-decoration:none;flex:none}
+.an{color:#fff;font-weight:600;text-decoration:none;font-size:15px}
+footer{max-width:640px;margin:0 auto;padding:6px 12px 110px;text-align:center;font-size:12px;color:#7d8fb8}
+footer a{margin:0 6px;color:#9db4ee}
+.av{overflow:hidden}
+.av.big{width:64px;height:64px;font-size:26px}
+.card .av img{width:100%;height:100%;margin:0;border-radius:50%;object-fit:cover;max-height:none;background:none}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
+.gt{position:relative;display:block;aspect-ratio:1;border-radius:14px;overflow:hidden;background:#050914}
+.gt img{width:100%;height:100%;object-fit:cover}
+.pl{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.55);color:#fff;border-radius:10px;padding:2px 7px;font-size:12px}
+#bar{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:calc(100% - 24px);max-width:520px;z-index:30;display:flex;justify-content:space-around;align-items:center;padding:6px;border-radius:28px;background:rgba(18,28,58,.88);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);box-shadow:0 10px 30px rgba(0,0,0,.45)}
+#bar button{background:transparent;color:#9db0dd;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 14px;border-radius:20px;font-size:11px;position:relative}
+#bar button .ic{font-size:20px;line-height:1}
+#bar button.on{background:rgba(99,132,255,.22);color:#fff}
+#bar button.plus{padding:0 10px;background:transparent}
+#bar button.plus .ic{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 6px 18px rgba(99,102,241,.5);margin-top:-16px}
+#bar .bdg{position:absolute;top:0;right:8px;min-width:18px;height:18px;border-radius:9px;background:#ef4444;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px}
 </style>
 </head>
 <body>
@@ -44,6 +69,7 @@ footer a{margin:0 6px}
 <nav id="nav"></nav>
 <main id="main"></main>
 <footer id="foot"></footer>
+<div id="bar"></div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -235,7 +261,23 @@ const EN = {
  "পাসওয়ার্ড ভুল।": "Wrong password.",
  "অনেকবার চেষ্টা করেছেন, একটু পরে আবার চেষ্টা করুন।": "Too many attempts, please try again later.",
  "Firebase-এ Email/Password লগইন এখনো চালু করা হয়নি।": "Email/Password login is not enabled in Firebase yet.",
- "ইন্টারনেট সংযোগে সমস্যা।": "Internet connection problem."
+ "ইন্টারনেট সংযোগে সমস্যা।": "Internet connection problem.",
+ "সর্বশেষ": "Latest",
+ "নোটিফিকেশন": "Alerts",
+ "প্রোফাইল সম্পাদনা": "Edit profile",
+ "প্রোফাইল ছবি বদলান": "Change profile photo",
+ "নিজের সম্পর্কে ছোট করে লিখুন (সর্বোচ্চ ১৬০ অক্ষর)": "Write a short bio (max 160 characters)",
+ "সংরক্ষণ করুন": "Save",
+ "সংরক্ষণ হচ্ছে...": "Saving...",
+ "প্রোফাইল সংরক্ষিত হয়েছে।": "Profile saved.",
+ "ছবি ৫MB এর বেশি হতে পারবে না।": "Photo must be 5MB or smaller.",
+ "শুধু ছবি দেওয়া যাবে।": "Only photos are allowed.",
+ "ফিড": "Feed",
+ "ছবি": "Photos",
+ "এখনো কোনো ছবি বা ভিডিও পোস্ট নেই।": "No photo or video posts yet.",
+ "প্রোফাইল রিসেট": "Reset profile",
+ "এই ইউজারের প্রোফাইল ছবি ও বায়ো মুছে ফেলবেন?": "Remove this user's profile photo and bio?",
+ "প্রোফাইল রিসেট হয়েছে।": "Profile reset."
 };
 const tx = s => (lang === "en" && EN[s] !== undefined) ? EN[s] : s;
 const loc = () => lang === "en" ? "en-GB" : "bn-BD";
@@ -412,8 +454,7 @@ function pageView() {
 function renderAuth() {
   const a = $("#auth"); a.innerHTML = "";
   a.append(el("button", {class: "sec", onclick: () => setLang(lang === "bn" ? "en" : "bn")}, LANG_LABEL[lang]));
-  if (!user) a.append(el("button", {class: "sec", onclick: () => show("login")}, tx("লগইন / সাইন আপ")));
-  else a.append(el("button", {class: "sec", onclick: () => signOut(auth)}, tx("লগআউট")));
+  if (user) a.append(el("button", {class: "sec", onclick: () => signOut(auth)}, tx("লগআউট")));
 }
 
 async function googleLogin() {
@@ -423,13 +464,30 @@ async function googleLogin() {
 }
 
 function renderNav() {
+  const feedTabs = ["home", "popular", "feed"];
+  const meTabs = ["me", "mine", "pending", "reports", "roles", "settings"];
   const n = $("#nav"); n.innerHTML = "";
-  const tabs = [["home", tx("হোম")], ["popular", tx("জনপ্রিয়")]];
-  if (user) tabs.push(["feed", tx("ফলো করা")], ["notif", "🔔" + (unread ? " " + unread : "")], ["new", tx("নতুন পোস্ট")], ["mine", tx("আমার পোস্ট")]);
-  if (isStaff()) tabs.push(["pending", tx("অপেক্ষমাণ")], ["reports", tx("রিপোর্ট")]);
-  if (isAdmin()) tabs.push(["roles", tx("রোল")], ["settings", tx("সেটিংস")]);
-  if (user) tabs.push(["me", tx("প্রোফাইল")]);
-  tabs.forEach(([k, l]) => n.append(el("button", {class: tab === k ? "on" : "", onclick: () => show(k)}, l)));
+  let pills = [];
+  if (feedTabs.includes(tab)) {
+    pills = [["home", tx("সর্বশেষ")], ["popular", tx("জনপ্রিয়")]];
+    if (user) pills.push(["feed", tx("ফলো করা")]);
+  } else if (user && meTabs.includes(tab)) {
+    pills = [["me", tx("প্রোফাইল")], ["mine", tx("আমার পোস্ট")]];
+    if (isStaff()) pills.push(["pending", tx("অপেক্ষমাণ")], ["reports", tx("রিপোর্ট")]);
+    if (isAdmin()) pills.push(["roles", tx("রোল")], ["settings", tx("সেটিংস")]);
+  }
+  n.style.display = pills.length ? "flex" : "none";
+  pills.forEach(([k, l]) => n.append(el("button", {class: tab === k ? "on" : "", onclick: () => show(k)}, l)));
+  const b = $("#bar"); b.innerHTML = "";
+  const inHome = ["home", "popular", "feed", "post", "user", "page"].includes(tab);
+  const items = user
+    ? [["home", "🏠", tx("হোম"), inHome], ["new", "➕", tx("পোস্ট"), tab === "new", "plus"], ["notif", "🔔", tx("নোটিফিকেশন"), tab === "notif"], ["me", "👤", tx("প্রোফাইল"), meTabs.includes(tab)]]
+    : [["home", "🏠", tx("হোম"), ["home", "post", "user", "page"].includes(tab)], ["popular", "🔥", tx("জনপ্রিয়"), tab === "popular"], ["login", "🔑", tx("লগইন"), tab === "login"]];
+  items.forEach(([k, ic, lb, on, cls]) => {
+    const btn = el("button", {class: (on ? "on " : "") + (cls || ""), onclick: () => show(k)}, el("span", {class: "ic"}, ic), el("span", {}, lb));
+    if (k === "notif" && unread) btn.append(el("span", {class: "bdg"}, String(unread)));
+    b.append(btn);
+  });
 }
 
 function show(t) {
@@ -627,17 +685,101 @@ async function popularFeed() {
   } catch (e) { ld.remove(); m.append(errBox(e)); }
 }
 
+const profCache = new Map();
+function getProfile(uid) {
+  if (!profCache.has(uid)) {
+    profCache.set(uid, getDoc(doc(db, "profiles", uid)).then(sn => sn.exists() ? sn.data() : null).catch(() => null));
+  }
+  return profCache.get(uid);
+}
+
+const okPhoto = u => typeof u === "string" && u.startsWith("https://res.cloudinary.com/" + CLOUD_NAME + "/");
+
+function avatarImg(u, size) {
+  return el("img", {
+    src: u.replace("/image/upload/", "/image/upload/f_auto,q_auto,c_fill,g_auto,w_" + size + ",h_" + size + "/"),
+    alt: "", loading: "lazy",
+    onerror: e => { if (e.target.src !== u) e.target.src = u; }
+  });
+}
+
+function thumb(p) {
+  const u = p.mediaUrl;
+  if (p.mediaType === "video") {
+    return u.replace("/video/upload/", "/video/upload/so_0,f_jpg,q_auto,c_fill,w_300,h_300/").replace(/\.[A-Za-z0-9]+(\?.*)?$/, ".jpg");
+  }
+  return u.replace("/image/upload/", "/image/upload/f_auto,q_auto,c_fill,g_auto,w_300,h_300/");
+}
+
+function editProfileCard() {
+  const card = el("div", {class: "card"}, el("b", {}, tx("প্রোফাইল সম্পাদনা")));
+  const msg = el("div", {class: "small"});
+  const name = el("input", {type: "text", placeholder: tx("আপনার নাম"), maxLength: 40, value: nm()});
+  const bio = el("textarea", {rows: 3, maxLength: 160, placeholder: tx("নিজের সম্পর্কে ছোট করে লিখুন (সর্বোচ্চ ১৬০ অক্ষর)")});
+  const file = el("input", {type: "file", accept: "image/*"});
+  const prev = el("div", {class: "av big"}, (nm().trim()[0] || "?").toUpperCase());
+  let photoUrl = "";
+  const save = el("button", {onclick: async () => {
+    const why = blockReason();
+    if (why) return msg.textContent = why;
+    const n = name.value.trim();
+    if (!n) return msg.textContent = tx("আপনার নাম দিন।");
+    const f = file.files[0];
+    if (f) {
+      if (!f.type.startsWith("image")) return msg.textContent = tx("শুধু ছবি দেওয়া যাবে।");
+      if (f.size > 5 * 1048576) return msg.textContent = tx("ছবি ৫MB এর বেশি হতে পারবে না।");
+    }
+    save.disabled = true; msg.textContent = tx("সংরক্ষণ হচ্ছে...");
+    try {
+      let url = photoUrl;
+      if (f) {
+        const fd = new FormData(); fd.append("file", f); fd.append("upload_preset", UPLOAD_PRESET);
+        const r = await fetch("https://api.cloudinary.com/v1_1/" + CLOUD_NAME + "/image/upload", {method: "POST", body: fd});
+        const j = await r.json();
+        if (!j.secure_url) throw new Error(tx("আপলোড ব্যর্থ"));
+        url = j.secure_url;
+      }
+      await setDoc(doc(db, "profiles", user.uid), {name: n.slice(0, 40), bio: bio.value.trim().slice(0, 160), photoUrl: url, updatedAt: serverTimestamp()});
+      if (n !== user.displayName) await updateProfile(user, {displayName: n});
+      profCache.delete(user.uid);
+      alert(tx("প্রোফাইল সংরক্ষিত হয়েছে।"));
+      show("me");
+    } catch (e) { msg.textContent = tx("সমস্যা: ") + e.message; save.disabled = false; }
+  }}, tx("সংরক্ষণ করুন"));
+  card.append(el("div", {class: "ph", style: "margin-top:10px"}, prev, el("div", {}, el("div", {class: "meta"}, tx("প্রোফাইল ছবি বদলান")), file)),
+    name, bio, el("div", {class: "row"}, save), msg);
+  getProfile(user.uid).then(pr => {
+    if (!pr) return;
+    if (pr.name) name.value = pr.name;
+    bio.value = pr.bio || "";
+    photoUrl = pr.photoUrl || "";
+    if (okPhoto(photoUrl)) { prev.textContent = ""; prev.append(avatarImg(photoUrl, 128)); }
+  });
+  return card;
+}
+
 async function userPage() {
   const m = $("#main");
   m.append(el("div", {class: "row"}, el("button", {class: "sec", onclick: () => { openUserId = null; show("home"); }}, tx("← হোম"))));
   const head = el("div", {class: "card"});
+  const tabs = el("div", {class: "row", style: "margin-top:0;margin-bottom:12px"});
+  const notice = el("div", {});
   const holder = el("div", {});
   const moreWrap = el("div", {class: "row", style: "justify-content:center"});
-  m.append(head, holder, moreWrap);
+  m.append(head, tabs, notice, holder, moreWrap);
   const uid = openUserId;
-  let last = null, total = null, shownName = "", followers = null, following = false;
-  const fillHead = name => {
+  let last = null, total = null, shownName = "", followers = null, following = false, prof = null;
+  let view = "list", loaded = [], firstDone = false;
+
+  const fillHead = () => {
+    const name = (prof && prof.name) || shownName || tx("ইউজার");
     head.innerHTML = "";
+    const avBig = el("div", {class: "av big"}, (name.trim()[0] || "?").toUpperCase());
+    if (prof && okPhoto(prof.photoUrl)) { avBig.textContent = ""; avBig.append(avatarImg(prof.photoUrl, 192)); }
+    head.append(el("div", {class: "ph"}, avBig, el("div", {},
+      el("b", {style: "font-size:18px"}, name),
+      el("div", {class: "meta", style: "margin:2px 0 0"}, tx("প্রকাশিত পোস্ট: ") + (total === null ? "..." : total) + tx(" · ফলোয়ার: ") + (followers === null ? "..." : followers)))));
+    if (prof && prof.bio) head.append(el("div", {style: "font-size:14px;margin:6px 0;white-space:pre-wrap"}, prof.bio));
     const row = el("div", {class: "row"});
     if (user && user.uid !== uid) {
       const fb = el("button", {class: following ? "sec" : "ok", onclick: async () => {
@@ -656,54 +798,88 @@ async function userPage() {
             notify({id: "follow_" + fid, to: uid, type: "follow", postId: "", text: ""});
           }
         } catch (e) { alert(tx("সমস্যা: ") + e.message); }
-        fillHead(shownName);
+        fillHead();
       }}, following ? tx("✓ ফলো করছেন") : tx("➕ ফলো করুন"));
       row.append(fb);
     }
-    row.append(el("button", {class: "sec", onclick: () => shareUrl(location.origin + location.pathname + "#user=" + uid, (name || tx("ইউজার")) + tx(" এর পোস্ট"))}, tx("↗ প্রোফাইল শেয়ার")));
-    head.append(el("b", {}, name || tx("ইউজার")),
-      el("div", {class: "meta"}, tx("প্রকাশিত পোস্ট: ") + (total === null ? "..." : total) + tx(" · ফলোয়ার: ") + (followers === null ? "..." : followers)),
-      row);
+    row.append(el("button", {class: "sec", onclick: () => shareUrl(location.origin + location.pathname + "#user=" + uid, name + tx(" এর পোস্ট"))}, tx("↗ প্রোফাইল শেয়ার")));
+    if (isStaff() && user && user.uid !== uid && prof) {
+      row.append(el("button", {class: "no", onclick: async () => {
+        if (!confirm(tx("এই ইউজারের প্রোফাইল ছবি ও বায়ো মুছে ফেলবেন?"))) return;
+        try { await deleteDoc(doc(db, "profiles", uid)); profCache.delete(uid); prof = null; fillHead(); alert(tx("প্রোফাইল রিসেট হয়েছে।")); }
+        catch (e) { alert(tx("সমস্যা: ") + e.message); }
+      }}, tx("প্রোফাইল রিসেট")));
+    }
+    head.append(row);
   };
-  fillHead("");
-  getCountFromServer(query(collection(db, "posts"), where("status", "==", "approved"), where("uid", "==", uid)))
-    .then(c => { total = c.data().count; fillHead(shownName); }).catch(() => {});
-  getCountFromServer(query(collection(db, "follows"), where("followee", "==", uid)))
-    .then(c => { followers = c.data().count; fillHead(shownName); }).catch(() => {});
-  if (user && user.uid !== uid) {
-    getDoc(doc(db, "follows", user.uid + "_" + uid)).then(sn => { following = sn.exists(); fillHead(shownName); }).catch(() => {});
-  }
+
+  const fillTabs = () => {
+    tabs.innerHTML = "";
+    [["list", tx("ফিড")], ["grid", tx("ছবি")]].forEach(([k, l]) =>
+      tabs.append(el("button", {class: view === k ? "" : "sec", onclick: () => { view = k; fillTabs(); renderItems(); }}, l)));
+  };
+
+  const renderItems = () => {
+    holder.innerHTML = "";
+    if (!loaded.length) {
+      if (firstDone) holder.append(el("div", {class: "center"}, tx("এই ইউজারের কোনো প্রকাশিত পোস্ট নেই।")));
+      return;
+    }
+    if (view === "grid") {
+      const media = loaded.filter(p => p.mediaUrl && /^https:\/\/res\.cloudinary\.com\//.test(p.mediaUrl));
+      if (!media.length) { holder.append(el("div", {class: "center"}, tx("এখনো কোনো ছবি বা ভিডিও পোস্ট নেই।"))); return; }
+      const g = el("div", {class: "grid"});
+      media.forEach(p => g.append(el("a", {href: "#post=" + p.id, class: "gt"},
+        el("img", {src: thumb(p), alt: "", loading: "lazy", onerror: e => { if (p.mediaType !== "video" && e.target.src !== p.mediaUrl) e.target.src = p.mediaUrl; }}),
+        p.mediaType === "video" ? el("span", {class: "pl"}, "▶") : "")));
+      holder.append(g);
+    } else {
+      loaded.forEach(p => holder.append(postCard(p, false, false)));
+    }
+  };
+
   const addItems = items => {
-    if (items.length && !shownName) { shownName = items[0].authorName || ""; fillHead(shownName); }
-    items.forEach(p => holder.append(postCard(p, false, false)));
+    if (items.length && !shownName) shownName = items[0].authorName || "";
+    loaded.push(...items);
+    fillHead(); renderItems();
   };
+
+  fillHead(); fillTabs();
+  getProfile(uid).then(pr => { prof = pr; fillHead(); });
+  getCountFromServer(query(collection(db, "posts"), where("status", "==", "approved"), where("uid", "==", uid)))
+    .then(c => { total = c.data().count; fillHead(); }).catch(() => {});
+  getCountFromServer(query(collection(db, "follows"), where("followee", "==", uid)))
+    .then(c => { followers = c.data().count; fillHead(); }).catch(() => {});
+  if (user && user.uid !== uid) {
+    getDoc(doc(db, "follows", user.uid + "_" + uid)).then(sn => { following = sn.exists(); fillHead(); }).catch(() => {});
+  }
+
   const load = async () => {
     moreWrap.innerHTML = "";
-    const ld = el("div", {class: "center"}, tx("লোড হচ্ছে..."));
-    holder.append(ld);
+    moreWrap.append(el("div", {class: "center", style: "padding:10px"}, tx("লোড হচ্ছে...")));
     try {
       const parts = [collection(db, "posts"), where("status", "==", "approved"), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(PAGE)];
       if (last) parts.push(startAfter(last));
       const snap = await getDocs(query(...parts));
-      ld.remove();
-      if (!snap.docs.length && !last) holder.append(el("div", {class: "center"}, tx("এই ইউজারের কোনো প্রকাশিত পোস্ট নেই।")));
+      moreWrap.innerHTML = "";
+      firstDone = true;
       addItems(snap.docs.map(d => ({id: d.id, ...d.data()})));
       if (snap.docs.length === PAGE) {
         last = snap.docs[snap.docs.length - 1];
         moreWrap.append(el("button", {class: "sec", onclick: load}, tx("আরও দেখুন")));
       }
     } catch (e) {
-      ld.remove();
+      moreWrap.innerHTML = "";
       if (e.code === "failed-precondition") {
-        if (isAdmin()) holder.append(errBox(e));
+        if (isAdmin()) notice.append(errBox(e));
         try {
           const snap = await getDocs(query(collection(db, "posts"), where("status", "==", "approved"), where("uid", "==", uid), limit(100)));
           const items = snap.docs.map(d => ({id: d.id, ...d.data()}))
             .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-          if (!items.length) holder.append(el("div", {class: "center"}, tx("এই ইউজারের কোনো প্রকাশিত পোস্ট নেই।")));
+          firstDone = true;
           addItems(items);
-        } catch (e2) { holder.append(errBox(e2)); }
-      } else holder.append(errBox(e));
+        } catch (e2) { notice.append(errBox(e2)); }
+      } else notice.append(errBox(e));
     }
   };
   load();
@@ -806,7 +982,7 @@ async function notifPanel() {
         rejected: tx("আপনার পোস্টটি বাতিল করা হয়েছে")
       }[n.type] || tx("নতুন নোটিফিকেশন");
       const when = n.createdAt ? new Date(n.createdAt.seconds * 1000).toLocaleString(loc()) : "";
-      const c = el("div", {class: "card", style: "cursor:pointer;" + (n.read ? "" : "background:#eff6ff")},
+      const c = el("div", {class: "card", style: "cursor:pointer;" + (n.read ? "" : "background:rgba(99,132,255,.2)")},
         el("div", {}, msg), el("div", {class: "meta", style: "margin-top:4px"}, when));
       c.onclick = () => {
         if (n.type === "follow") location.hash = "#user=" + n.from;
@@ -853,9 +1029,17 @@ function optPoster(u) {
 function postCard(p, staffMode, showStatus, autoOpen) {
   const c = el("div", {class: "card"});
   const when = p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleString(loc()) : "";
-  const meta = el("div", {class: "meta"}, p.uid ? el("a", {href: "#user=" + p.uid}, p.authorName || tx("অজ্ঞাত")) : (p.authorName || tx("অজ্ঞাত")), " · ", p.status === "approved" ? el("a", {href: "#post=" + p.id}, when || tx("লিংক")) : when, " ");
-  if (showStatus) meta.append(el("span", {class: "badge " + p.status}, {pending: tx("অপেক্ষমাণ"), approved: tx("অনুমোদিত"), rejected: tx("বাতিল")}[p.status] || p.status));
-  c.append(meta);
+  const nameTxt = p.authorName || tx("অজ্ঞাত");
+  const av = el(p.uid ? "a" : "div", p.uid ? {href: "#user=" + p.uid, class: "av"} : {class: "av"}, (nameTxt.trim()[0] || "?").toUpperCase());
+  const nameEl = p.uid ? el("a", {href: "#user=" + p.uid, class: "an"}, nameTxt) : el("span", {class: "an"}, nameTxt);
+  const sub = el("div", {class: "meta", style: "margin:0"}, p.status === "approved" ? el("a", {href: "#post=" + p.id}, when || tx("লিংক")) : when, " ");
+  if (showStatus) sub.append(el("span", {class: "badge " + p.status}, {pending: tx("অপেক্ষমাণ"), approved: tx("অনুমোদিত"), rejected: tx("বাতিল")}[p.status] || p.status));
+  c.append(el("div", {class: "ph"}, av, el("div", {}, nameEl, sub)));
+  if (p.uid) getProfile(p.uid).then(pr => {
+    if (!pr) return;
+    if (pr.name) nameEl.textContent = pr.name;
+    if (okPhoto(pr.photoUrl)) { av.textContent = ""; av.append(avatarImg(pr.photoUrl, 80)); }
+  });
   if (p.text) c.append(el("div", {style: "white-space:pre-wrap"}, p.text));
   if (p.mediaUrl && /^https:\/\/res\.cloudinary\.com\//.test(p.mediaUrl)) {
     c.append(p.mediaType === "video"
@@ -1174,7 +1358,7 @@ function profile() {
           catch (e) { alert(aerr(e)); }
         }}, tx("ভেরিফাই করেছি, চেক করুন"))));
   }
-  $("#main").append(card);
+  $("#main").append(card, editProfileCard());
 }
 </script>
 </body>
