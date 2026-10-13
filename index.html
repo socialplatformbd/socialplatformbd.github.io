@@ -14,7 +14,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif;color:#e8ecf8;background:#0b1224 linear-gradient(160deg,#0b1224 0%,#13204a 55%,#0a1a33 100%) fixed;min-height:100vh}
 header{position:sticky;top:0;z-index:20;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;background:rgba(11,18,36,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
-header h1{font-size:18px;margin:0;display:flex;align-items:center;gap:8px;color:#fff}
+header h1{font-size:18px;margin:0 0 0 10px;flex:1;display:flex;align-items:center;gap:8px;color:#fff}
 header h1::before{content:"S";display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);font-weight:800;font-size:16px}
 button{border:0;border-radius:12px;padding:9px 14px;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-family:inherit}
 button:disabled{opacity:.5}
@@ -48,6 +48,16 @@ a{color:#7fb2ff}
 .an{color:#fff;font-weight:600;text-decoration:none;font-size:15px}
 footer{max-width:640px;margin:0 auto;padding:6px 12px 110px;text-align:center;font-size:12px;color:#7d8fb8}
 footer a{margin:0 6px;color:#9db4ee}
+#menuBtn{background:rgba(255,255,255,.1);color:#fff;padding:7px 12px;font-size:18px;line-height:1}
+select{width:100%;padding:11px 12px;border:1px solid rgba(255,255,255,.16);border-radius:12px;font-size:15px;margin-bottom:8px;background:rgba(255,255,255,.07);color:#fff;font-family:inherit}
+option{color:#111;background:#fff}
+.ct{margin-left:auto;font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(99,132,255,.18);color:#bcd0ff;text-decoration:none;white-space:nowrap}
+#drawer{position:fixed;inset:0;z-index:50;display:flex}
+#drawer.hide{display:none}
+#drawer .bk{flex:1;background:rgba(0,0,0,.55)}
+#drawer .pn{width:280px;max-width:80%;background:#0f1a3a;border-right:1px solid rgba(255,255,255,.12);padding:14px;overflow-y:auto}
+.mi{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:transparent;color:#dbe4ff;padding:12px;border-radius:12px;font-size:15px;margin-bottom:2px}
+.mi.on{background:rgba(99,132,255,.22);color:#fff}
 .vb{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#1d9bf0;color:#fff;font-size:11px;font-weight:700;margin-left:5px;vertical-align:middle;line-height:1}
 .av{overflow:hidden}
 .av.big{width:64px;height:64px;font-size:26px}
@@ -66,11 +76,12 @@ footer a{margin:0 6px;color:#9db4ee}
 </style>
 </head>
 <body>
-<header><h1>Social platform bd</h1><div id="auth"></div></header>
+<header><button id="menuBtn" aria-label="Menu">☰</button><h1>Social platform bd</h1><div id="auth"></div></header>
 <nav id="nav"></nav>
 <main id="main"></main>
 <footer id="foot"></footer>
 <div id="bar"></div>
+<div id="drawer" class="hide"></div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -290,7 +301,12 @@ const EN = {
  "ভেরিফিকেশন সরাবেন?": "Remove the verified badge?",
  "ভেরিফাইড চিহ্ন যোগ হয়েছে।": "Verified badge added.",
  "ভেরিফাইড চিহ্ন সরানো হয়েছে।": "Verified badge removed.",
- "ভেরিফাইড অ্যাকাউন্ট": "Verified account"
+ "ভেরিফাইড অ্যাকাউন্ট": "Verified account",
+ "ক্যাটাগরি": "Categories",
+ "সব পোস্ট": "All posts",
+ "ক্যাটাগরি (ঐচ্ছিক)": "Category (optional)",
+ "সাধারণ (কোনো ক্যাটাগরি নয়)": "General (no category)",
+ "এই ক্যাটাগরিতে এখনো কোনো পোস্ট নেই।": "No posts in this category yet."
 };
 const tx = s => (lang === "en" && EN[s] !== undefined) ? EN[s] : s;
 const loc = () => lang === "en" ? "en-GB" : "bn-BD";
@@ -303,6 +319,16 @@ function setLang(l) {
 }
 /*NOI18N*/
 const LANG_LABEL = {bn: "English", en: "বাংলা"};
+const CATS = [
+  {k: "news", e: "📰", bn: "খবর", en: "News"},
+  {k: "islamic", e: "🕌", bn: "ইসলামিক", en: "Islamic"},
+  {k: "sports", e: "⚽", bn: "খেলাধুলা", en: "Sports"},
+  {k: "entertainment", e: "🎬", bn: "বিনোদন", en: "Entertainment"},
+  {k: "technology", e: "💻", bn: "প্রযুক্তি", en: "Technology"},
+  {k: "education", e: "📚", bn: "শিক্ষা", en: "Education"},
+  {k: "lifestyle", e: "🌿", bn: "জীবনযাপন", en: "Lifestyle"},
+  {k: "funny", e: "😄", bn: "মজা", en: "Funny"}
+];
 const PAGES = {
   rules: {
     title: {bn: "নিয়মাবলী", en: "Community Rules"},
@@ -379,13 +405,17 @@ const parseHash = () => {
   if (m) return {t: "user", id: m[1]};
   m = location.hash.match(/^#page=(rules|privacy|about)/);
   if (m) return {t: "page", id: m[1]};
+  m = location.hash.match(/^#cat=([a-z]+)/);
+  if (m) return {t: "cat", id: m[1]};
   return null;
 };
 const r0 = parseHash();
 let openPostId = r0 && r0.t === "post" ? r0.id : null;
 let openUserId = r0 && r0.t === "user" ? r0.id : null;
 let openPage = r0 && r0.t === "page" ? r0.id : null;
-let user = null, role = "user", tab = openPostId ? "post" : openUserId ? "user" : openPage ? "page" : "home", banned = false;
+let openCat = r0 && r0.t === "cat" ? r0.id : null;
+let newPostCat = "";
+let user = null, role = "user", tab = openPostId ? "post" : openUserId ? "user" : openPage ? "page" : openCat ? "cat" : "home", banned = false;
 let popCache = null, unread = 0, badgeT = 0;
 let cfg = {autoApprove: false, requireVerify: false};
 const $ = s => document.querySelector(s);
@@ -464,7 +494,7 @@ onAuthStateChanged(auth, async u => {
 function renderFoot() {
   const f = $("#foot"); f.innerHTML = "";
   f.append(el("div", {}, el("a", {href: "#page=rules"}, tx("নিয়মাবলী")), el("a", {href: "#page=privacy"}, tx("প্রাইভেসি পলিসি")), el("a", {href: "#page=about"}, tx("আমাদের সম্পর্কে"))),
-    el("div", {style: "margin-top:6px"}, "© " + SITE + " · v16"));
+    el("div", {style: "margin-top:6px"}, "© " + SITE + " · v17"));
 }
 
 function pageView() {
@@ -480,7 +510,6 @@ function pageView() {
 function renderAuth() {
   const a = $("#auth"); a.innerHTML = "";
   a.append(el("button", {class: "sec", onclick: () => setLang(lang === "bn" ? "en" : "bn")}, LANG_LABEL[lang]));
-  if (user) a.append(el("button", {class: "sec", onclick: () => signOut(auth)}, tx("লগআউট")));
 }
 
 async function googleLogin() {
@@ -505,7 +534,7 @@ function renderNav() {
   n.style.display = pills.length ? "flex" : "none";
   pills.forEach(([k, l]) => n.append(el("button", {class: tab === k ? "on" : "", onclick: () => show(k)}, l)));
   const b = $("#bar"); b.innerHTML = "";
-  const inHome = ["home", "popular", "feed", "post", "user", "page"].includes(tab);
+  const inHome = ["home", "popular", "feed", "post", "user", "page", "cat"].includes(tab);
   const items = user
     ? [["home", "🏠", tx("হোম"), inHome], ["search", "🔍", tx("খুঁজুন"), tab === "search"], ["new", "➕", tx("পোস্ট"), tab === "new", "plus"], ["notif", "🔔", tx("নোটিফিকেশন"), tab === "notif"], ["me", "👤", tx("প্রোফাইল"), meTabs.includes(tab)]]
     : [["home", "🏠", tx("হোম"), ["home", "post", "user", "page"].includes(tab)], ["popular", "🔥", tx("জনপ্রিয়"), tab === "popular"], ["search", "🔍", tx("খুঁজুন"), tab === "search"], ["login", "🔑", tx("লগইন"), tab === "login"]];
@@ -517,12 +546,13 @@ function renderNav() {
 }
 
 function show(t) {
-  tab = t; renderNav(); refreshBadge(false);
+  tab = t; closeDrawer(); renderNav(); refreshBadge(false);
   const m = $("#main"); m.innerHTML = "";
-  if (t !== "post" && t !== "user" && t !== "page" && location.hash) history.replaceState(null, "", location.pathname + location.search);
+  if (t !== "post" && t !== "user" && t !== "page" && t !== "cat" && location.hash) history.replaceState(null, "", location.pathname + location.search);
   if (t === "post") return openPostId ? singlePost() : show("home");
   if (t === "user") return openUserId ? userPage() : show("home");
   if (t === "page") return openPage ? pageView() : show("home");
+  if (t === "cat") return catOf(openCat) ? categoryFeed() : show("home");
   if (t === "login") return user ? show("home") : loginView();
   if (t === "home") return homeFeed();
   if (t === "popular") return popularFeed();
@@ -686,7 +716,8 @@ window.addEventListener("hashchange", () => {
   if (r && r.t === "post") { openPostId = r.id; show("post"); }
   else if (r && r.t === "user") { openUserId = r.id; show("user"); }
   else if (r && r.t === "page") { openPage = r.id; show("page"); }
-  else if (tab === "post" || tab === "user" || tab === "page") { openPostId = null; openUserId = null; openPage = null; show("home"); }
+  else if (r && r.t === "cat") { openCat = r.id; show("cat"); }
+  else if (tab === "post" || tab === "user" || tab === "page" || tab === "cat") { openPostId = null; openUserId = null; openPage = null; openCat = null; show("home"); }
 });
 
 async function popularFeed() {
@@ -786,6 +817,70 @@ function editProfileCard() {
     if (okPhoto(photoUrl)) { prev.textContent = ""; prev.append(avatarImg(photoUrl, 128)); }
   });
   return card;
+}
+
+const catOf = k => CATS.find(c => c.k === k);
+const catName = c => c.e + " " + (lang === "en" ? c.en : c.bn);
+
+function closeDrawer() { $("#drawer").className = "hide"; }
+function openDrawer() { renderDrawer(); $("#drawer").className = ""; }
+function renderDrawer() {
+  const d = $("#drawer"); d.innerHTML = "";
+  const pn = el("div", {class: "pn"});
+  pn.append(el("div", {class: "row", style: "justify-content:space-between;align-items:center;margin:0 0 8px"},
+    el("b", {}, tx("ক্যাটাগরি")), el("button", {class: "sec", onclick: closeDrawer}, "✕")));
+  pn.append(el("button", {class: "mi" + (tab === "home" ? " on" : ""), onclick: () => { openCat = null; show("home"); }}, "🏠 " + tx("সব পোস্ট")));
+  CATS.forEach(c => pn.append(el("button", {class: "mi" + (tab === "cat" && openCat === c.k ? " on" : ""), onclick: () => {
+    openCat = c.k; history.replaceState(null, "", "#cat=" + c.k); show("cat");
+  }}, catName(c))));
+  if (user) pn.append(el("button", {class: "mi", onclick: () => { closeDrawer(); signOut(auth); }}, "🚪 " + tx("লগআউট")));
+  d.append(pn, el("div", {class: "bk", onclick: closeDrawer}));
+}
+$("#menuBtn").addEventListener("click", openDrawer);
+
+async function categoryFeed() {
+  const m = $("#main");
+  const cat = catOf(openCat);
+  m.append(el("div", {class: "card"},
+    el("b", {style: "font-size:17px"}, catName(cat)),
+    el("div", {class: "row"},
+      el("button", {class: "sec", onclick: () => { openCat = null; show("home"); }}, tx("← সব পোস্ট")),
+      user ? el("button", {onclick: () => { newPostCat = cat.k; show("new"); }}, tx("নতুন পোস্ট")) : "")));
+  const holder = el("div", {});
+  const moreWrap = el("div", {class: "row", style: "justify-content:center"});
+  m.append(holder, moreWrap);
+  let last = null;
+  const emptyMsg = () => el("div", {class: "center"}, tx("এই ক্যাটাগরিতে এখনো কোনো পোস্ট নেই।"));
+  const load = async () => {
+    moreWrap.innerHTML = "";
+    const ld = el("div", {class: "center"}, tx("লোড হচ্ছে..."));
+    holder.append(ld);
+    try {
+      const parts = [collection(db, "posts"), where("status", "==", "approved"), where("category", "==", cat.k), orderBy("createdAt", "desc"), limit(PAGE)];
+      if (last) parts.push(startAfter(last));
+      const snap = await getDocs(query(...parts));
+      ld.remove();
+      if (!snap.docs.length && !last) holder.append(emptyMsg());
+      snap.docs.forEach(d => holder.append(postCard({id: d.id, ...d.data()}, false, false)));
+      if (snap.docs.length === PAGE) {
+        last = snap.docs[snap.docs.length - 1];
+        moreWrap.append(el("button", {class: "sec", onclick: load}, tx("আরও দেখুন")));
+      }
+    } catch (e) {
+      ld.remove();
+      if (e.code === "failed-precondition") {
+        if (isAdmin()) holder.append(errBox(e));
+        try {
+          const snap = await getDocs(query(collection(db, "posts"), where("status", "==", "approved"), where("category", "==", cat.k), limit(100)));
+          const items = snap.docs.map(d => ({id: d.id, ...d.data()}))
+            .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+          if (!items.length) holder.append(emptyMsg());
+          items.forEach(p => holder.append(postCard(p, false, false)));
+        } catch (e2) { holder.append(errBox(e2)); }
+      } else holder.append(errBox(e));
+    }
+  };
+  load();
 }
 
 let searchTimer = null;
@@ -1108,7 +1203,7 @@ function postCard(p, staffMode, showStatus, autoOpen) {
   const nameEl = p.uid ? el("a", {href: "#user=" + p.uid, class: "an"}, nameTxt) : el("span", {class: "an"}, nameTxt);
   const sub = el("div", {class: "meta", style: "margin:0"}, p.status === "approved" ? el("a", {href: "#post=" + p.id}, when || tx("লিংক")) : when, " ");
   if (showStatus) sub.append(el("span", {class: "badge " + p.status}, {pending: tx("অপেক্ষমাণ"), approved: tx("অনুমোদিত"), rejected: tx("বাতিল")}[p.status] || p.status));
-  c.append(el("div", {class: "ph"}, av, el("div", {}, nameEl, sub)));
+  c.append(el("div", {class: "ph"}, av, el("div", {}, nameEl, sub), catOf(p.category) ? el("a", {class: "ct", href: "#cat=" + p.category}, catName(catOf(p.category))) : ""));
   if (p.uid) getProfile(p.uid).then(pr => {
     if (!pr) return;
     if (pr.name) nameEl.textContent = pr.name;
@@ -1271,6 +1366,9 @@ function newPost() {
   const ta = el("textarea", {rows: 5, placeholder: tx("আপনার লেখা...")});
   const file = el("input", {type: "file", accept: "image/*,video/*"});
   const msg = el("div", {class: "small"});
+  const sel = el("select", {}, el("option", {value: ""}, tx("সাধারণ (কোনো ক্যাটাগরি নয়)")), ...CATS.map(c => el("option", {value: c.k}, catName(c))));
+  sel.value = catOf(newPostCat) ? newPostCat : "";
+  newPostCat = "";
   const agree = el("input", {type: "checkbox"});
   const agreeRow = el("label", {class: "small", style: "display:flex;gap:6px;align-items:center;margin-top:8px"},
     agree, tx("আমি "), el("a", {href: location.origin + location.pathname + "#page=rules", target: "_blank"}, tx("নিয়মাবলী")), tx(" পড়েছি ও মানছি"));
@@ -1304,14 +1402,14 @@ function newPost() {
       await addDoc(collection(db, "posts"), {
         uid: user.uid, authorName: nm(),
         text: text.slice(0, 5000), mediaUrl, mediaType,
-        status, createdAt: serverTimestamp()
+        status, createdAt: serverTimestamp(), category: catOf(sel.value) ? sel.value : ""
       });
-      track("post_created", {status, has_media: mediaUrl ? 1 : 0});
+      track("post_created", {status, has_media: mediaUrl ? 1 : 0, category: sel.value || "general"});
       alert(status === "approved" ? tx("পোস্ট প্রকাশিত হয়েছে।") : tx("পোস্ট জমা হয়েছে। অনুমোদনের পর সবাই দেখতে পাবে।"));
       show(status === "approved" ? "home" : "mine");
     } catch (e) { msg.textContent = tx("সমস্যা: ") + e.message; btn.disabled = false; }
   }}, tx("পোস্ট করুন"));
-  m.append(el("div", {class: "card"}, ta, file, agreeRow, el("div", {class: "row"}, btn), msg));
+  m.append(el("div", {class: "card"}, el("div", {class: "meta"}, tx("ক্যাটাগরি (ঐচ্ছিক)")), sel, ta, file, agreeRow, el("div", {class: "row"}, btn), msg));
 }
 
 async function reportsPanel() {
@@ -1424,7 +1522,7 @@ function profile() {
     el("div", {}, tx("রোল: ") + role),
     el("div", {class: "meta"}, tx("আপনার UID:")), el("div", {class: "small"}, user.uid));
   if (banned) card.append(el("div", {class: "meta", style: "margin-top:8px"}, tx("আপনার অ্যাকাউন্ট ব্লক করা হয়েছে।")));
-  card.append(el("div", {class: "row"}, el("button", {class: "sec", onclick: () => { location.hash = "#user=" + user.uid; }}, tx("আমার পাবলিক পেজ দেখুন"))));
+  card.append(el("div", {class: "row"}, el("button", {class: "sec", onclick: () => { location.hash = "#user=" + user.uid; }}, tx("আমার পাবলিক পেজ দেখুন")), el("button", {class: "no", onclick: () => signOut(auth)}, tx("লগআউট"))));
   if (user.providerData.some(p => p.providerId === "password") && !user.emailVerified) {
     card.append(el("div", {class: "meta", style: "margin-top:10px"}, tx("আপনার ইমেইল ভেরিফাই করা হয়নি") + (cfg.requireVerify ? tx(" (এখন পোস্ট, লাইক ও কমেন্টের জন্য জরুরি)।") : ".")),
       el("div", {class: "row"},
